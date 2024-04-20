@@ -135,7 +135,7 @@ class HBNBCommand(cmd.Cmd):
             key, value = key_value[0], key_value[1]
 
             if value.startswith('"') and value.endswith('"'):
-                value = value[1:-1]
+                value = value[1:-1].replace("_"," ")
             elif '.' in value:
                 value = float(value)
             else:
