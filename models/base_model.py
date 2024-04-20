@@ -2,25 +2,38 @@
 """This module defines a base class for all models in our hbnb clone"""
 import uuid
 from datetime import datetime
-
+from models import storage
 
 class BaseModel:
     """A base class for all hbnb models"""
     def __init__(self, *args, **kwargs):
-        """Instatntiates a new model"""
+        """Instantiate a new model with optional keyword arguments"""
         if not kwargs:
-            from models import storage
+            # Create a new instance with default values
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
             storage.new(self)
         else:
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            del kwargs['__class__']
+            if 'created_at' in kwargs:
+                kwargs['created_at'] = datetime.strptime(kwargs['created_at'], '%Y-%m-%dT%H:%M:%S.%f')
+            else:
+                kwargs['created_at'] = datetime.now()
+
+            if 'updated_at' in kwargs:
+                kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'], '%Y-%m-%dT%H:%M:%S.%f')
+            else:
+                kwargs['updated_at'] = datetime.now()
+
+            if '__class__' in kwargs:
+                del kwargs['__class__']
+
             self.__dict__.update(kwargs)
+
+            if 'id' not in self.__dict__:
+                self.id = str(uuid.uuid4())
+
+            storage.new(self)
 
     def __str__(self):
         """Returns a string representation of the instance"""
